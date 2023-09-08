@@ -11,23 +11,15 @@ import {
 } from "redux-persist";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
-const persistPostsConfig = {
-  key: "posts",
-  storage: AsyncStorage,
-};
-const persistAuthConfig = {
-  key: "auth",
+const persistConfig = {
+  key: "root",
   storage: AsyncStorage,
 };
 
-const persistedPostsReducer = persistReducer(persistPostsConfig, postsReducer);
-const persistedAuthReducer = persistReducer(persistAuthConfig, authReducer);
+const reducer = persistReducer(persistConfig, rootReducer);
 
 const store = configureStore({
-  reducer: {
-    posts: persistedPostsReducer,
-    auth: persistedAuthReducer,
-  },
+  reducer,
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({
       serializableCheck: {
