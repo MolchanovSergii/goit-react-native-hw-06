@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useDispatch } from "react-redux";
 import {
   View,
   Text,
@@ -14,6 +15,10 @@ import {
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 
+import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
+import { auth } from "../config";
+import { createUser } from "../redux/authReducer";
+
 import BackGroundImage from "../components/BackGroundImage";
 
 const RegistrationScreen = () => {
@@ -21,8 +26,9 @@ const RegistrationScreen = () => {
   const [login, setLogin] = useState("");
   const [password, setPassword] = useState("");
   const navigation = useNavigation();
+  const dispatch = useDispatch();
 
-  const handleLogin = () => {
+  const handleRegister = async () => {
     if (email === "" || login === "" || password === "") {
       Alert.alert(
         "!!Обратите внимание!!",
@@ -30,11 +36,26 @@ const RegistrationScreen = () => {
       );
       return;
     }
+    try {
+      const userCredential = await createUserWithEmailAndPassword(
+        auth,
+        email,
+        password
+      );
+      const user = userCredential.user;
 
-    navigation.navigate("Home");
-    setEmail("");
-    setLogin("");
-    setPassword("");
+      if (user) {
+        await updateProfile(user, { displayName: login });
+        dispatch(createUser({ email: user.email, password: password }));
+      }
+
+      navigation.navigate("Home");
+      setEmail("");
+      setLogin("");
+      setPassword("");
+    } catch (error) {
+      Alert.alert("Ошибка", error.message);
+    }
   };
 
   return (
@@ -71,7 +92,7 @@ const RegistrationScreen = () => {
               value={password}
               onChangeText={setPassword}
             ></TextInput>
-            <TouchableOpacity style={style.button} onPress={handleLogin}>
+            <TouchableOpacity style={style.button} onPress={handleRegister}>
               <Text style={style.buttonText}>Зареєстуватися</Text>
             </TouchableOpacity>
             <Text
