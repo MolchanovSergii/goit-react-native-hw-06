@@ -17,7 +17,7 @@ import BackGroundImage from "../components/BackGroundImage";
 
 const LoginScreen = () => {
   const [email, setEmail] = useState("");
-  const [login, setLogin] = useState("");
+  const [password, setPassword] = useState("");
   const navigation = useNavigation();
 
   const handleLogin = () => {
@@ -31,7 +31,7 @@ const LoginScreen = () => {
 
     navigation.navigate("Home");
     setEmail("");
-    setLogin("");
+    setPassword("");
   };
 
   return (
@@ -44,16 +44,17 @@ const LoginScreen = () => {
             <Text style={style.title}>Увійти</Text>
             <TextInput
               style={style.input}
-              placeholder="Логін"
-              value={login}
-              onChangeText={setLogin}
-            ></TextInput>
-            <TextInput
-              style={style.input}
               placeholder="Адреса електронної пошти"
               value={email}
               onChangeText={setEmail}
             ></TextInput>
+            <TextInput
+              style={style.input}
+              placeholder="Пароль"
+              value={password}
+              onChangeText={setPassword}
+            ></TextInput>
+
             <TouchableOpacity style={style.button} onPress={handleLogin}>
               <Text style={style.buttonText}>Увійти</Text>
             </TouchableOpacity>
