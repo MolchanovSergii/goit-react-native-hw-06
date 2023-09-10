@@ -1,3 +1,5 @@
+import React, { useEffect, useState } from "react";
+
 import {
   View,
   Text,
@@ -5,18 +7,19 @@ import {
   StyleSheet,
   TouchableOpacity,
   Image,
+  ScrollView,
 } from "react-native";
 import { signOut } from "firebase/auth";
 import { useDispatch } from "react-redux";
 import { logOut } from "../redux/authReducer";
 
-import React, { useEffect } from "react";
-
+import { auth, db } from "../config";
+import { collection, getDocs } from "firebase/firestore";
 import { Feather, EvilIcons } from "@expo/vector-icons";
 
-import { auth } from "../config";
-
 const PostsScreen = ({ route, navigation }) => {
+  const [posts, setPosts] = useState([]);
+
   const userLocation = route.params?.userLocation;
   const photoUri = route.params?.photoUri;
   const photoName = route.params?.photoName;
@@ -42,34 +45,50 @@ const PostsScreen = ({ route, navigation }) => {
         </TouchableOpacity>
       ),
     });
+
+    const fetchPosts = async () => {
+      const postsCollection = collection(db, "posts");
+      const postSnapshot = await getDocs(postsCollection);
+      const postList = postSnapshot.docs.map((doc) => ({
+        ...doc.data(),
+        id: doc.id,
+      }));
+      setPosts(postList);
+    };
+
+    fetchPosts();
   }, [navigation, handleLogOut]);
 
   return (
-    <View style={style.container}>
-      <View style={style.post_container}>
-        {photoUri && <Image source={{ uri: photoUri }} style={style.photo} />}
-        <Text style={style.photoName}>{photoName}</Text>
+    <ScrollView contentContainerStyle={style.container}>
+      {posts.map((post) => (
+        <View key={post.id} style={style.post_container}>
+          <Image source={{ uri: post.photoUri }} style={style.photo} />
+          <Text style={style.photoName}>{post.photoName}</Text>
 
-        <View style={style.iconContainer}>
-          <TouchableOpacity
-            style={style.message_icon}
-            onPress={() => navigation.navigate("CommentsScreen")}
-          >
-            <Feather name="message-circle" size={24} color="black" />
-          </TouchableOpacity>
+          <View style={style.iconContainer}>
+            <TouchableOpacity
+              style={style.message_icon}
+              onPress={() => navigation.navigate("CommentsScreen")}
+            >
+              <Feather name="message-circle" size={24} color="black" />
+            </TouchableOpacity>
 
-          <TouchableOpacity
-            style={style.location_icon}
-            onPress={() =>
-              navigation.navigate("MapScreen", { location: userLocation })
-            }
-          >
-            <EvilIcons name="location" size={24} color="black" />
-            <Text style={style.location_title}>{locationName}</Text>
-          </TouchableOpacity>
+            <TouchableOpacity
+              style={style.location_icon}
+              onPress={() =>
+                navigation.navigate("MapScreen", {
+                  location: post.userLocation,
+                })
+              }
+            >
+              <EvilIcons name="location" size={24} color="black" />
+              <Text style={style.location_title}>{post.locationName}</Text>
+            </TouchableOpacity>
+          </View>
         </View>
-      </View>
-    </View>
+      ))}
+    </ScrollView>
   );
 };
 
