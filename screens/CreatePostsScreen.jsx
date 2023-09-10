@@ -1,5 +1,9 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { useFocusEffect } from "@react-navigation/native";
+import { useDispatch } from "react-redux";
+import { addPost } from "../redux/postsReducer";
+import { db } from "../config";
+import { collection, addDoc } from "firebase/firestore";
 
 import {
   Text,
@@ -27,6 +31,8 @@ const CreatePostsScreen = ({ navigation }) => {
   const [photoUri, setPhotoUri] = useState("");
   const [loading, setLoading] = useState(false);
 
+  const dispatch = useDispatch();
+
   useEffect(() => {
     (async () => {
       const { status } = await Camera.requestCameraPermissionsAsync();
@@ -50,6 +56,15 @@ const CreatePostsScreen = ({ navigation }) => {
   if (hasPermission === false) {
     return <Text>No access to camera</Text>;
   }
+
+  const addPostToFirebase = async (post) => {
+    try {
+      const docRef = await addDoc(collection(db, "posts"), post);
+      console.log("Document written with ID: ", docRef.id);
+    } catch (e) {
+      console.error("Error adding document: ", e);
+    }
+  };
 
   const handleTakePhoto = async () => {
     if (cameraRef) {
@@ -90,6 +105,17 @@ const CreatePostsScreen = ({ navigation }) => {
     if (!photoUri) {
       await handleTakePhoto();
     }
+    const post = {
+      photoName,
+      locationName: locationName || truncatedAddress,
+      photoUri,
+      location,
+      commentsNumber: 0,
+    };
+
+    await addPostToFirebase(post);
+
+    dispatch(addPost(post));
 
     setLoading(false);
 
