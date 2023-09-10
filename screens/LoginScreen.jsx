@@ -1,4 +1,6 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { useNavigation } from "@react-navigation/native";
 import {
   View,
   Text,
@@ -11,17 +13,29 @@ import {
   Keyboard,
   Alert,
 } from "react-native";
-import { useNavigation } from "@react-navigation/native";
+
+import { logIn } from "../redux/authReducer";
+import { signInWithEmailAndPassword } from "firebase/auth";
+import { auth } from "../config";
 
 import BackGroundImage from "../components/BackGroundImage";
 
 const LoginScreen = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const navigation = useNavigation();
 
-  const handleLogin = () => {
-    if (email === "" || login === "") {
+  const isLoggedIn = useSelector((state) => state.auth.isLoggedIn);
+  const navigation = useNavigation();
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    if (isLoggedIn) {
+      navigation.navigate("Home");
+    }
+  }, [isLoggedIn, navigation]);
+
+  const handleLogin = async () => {
+    if (email === "" || password === "") {
       Alert.alert(
         "!!Обратите внимание!!",
         "все поля формы регистрации должны быть заполнены"
@@ -29,9 +43,22 @@ const LoginScreen = () => {
       return;
     }
 
-    navigation.navigate("Home");
-    setEmail("");
-    setPassword("");
+    try {
+      const credentials = await signInWithEmailAndPassword(
+        auth,
+        email,
+        password
+      );
+      dispatch(logIn({ email, password }));
+      navigation.navigate("Home");
+      return credentials.user;
+    } catch (error) {
+      Alert.alert("Ошибка", error.message);
+    }
+
+    // navigation.navigate("Home");
+    // setEmail("");
+    // setPassword("");
   };
 
   return (

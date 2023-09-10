@@ -25,6 +25,7 @@ const RegistrationScreen = () => {
   const [email, setEmail] = useState("");
   const [login, setLogin] = useState("");
   const [password, setPassword] = useState("");
+
   const navigation = useNavigation();
   const dispatch = useDispatch();
 
@@ -48,14 +49,12 @@ const RegistrationScreen = () => {
         await updateProfile(user, { displayName: login });
         dispatch(createUser({ email: user.email, password: password }));
       }
-
-      navigation.navigate("Home");
-      setEmail("");
-      setLogin("");
-      setPassword("");
+      console.log(user);
     } catch (error) {
       Alert.alert("Ошибка", error.message);
     }
+
+    navigation.navigate("Home");
   };
 
   return (
