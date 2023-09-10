@@ -6,14 +6,43 @@ import {
   TouchableOpacity,
   Image,
 } from "react-native";
+import { signOut } from "firebase/auth";
+import { useDispatch } from "react-redux";
+import { logOut } from "../redux/authReducer";
+
+import React, { useEffect } from "react";
 
 import { Feather, EvilIcons } from "@expo/vector-icons";
+
+import { auth } from "../config";
 
 const PostsScreen = ({ route, navigation }) => {
   const userLocation = route.params?.userLocation;
   const photoUri = route.params?.photoUri;
   const photoName = route.params?.photoName;
   const locationName = route.params?.locationName;
+
+  const dispatch = useDispatch();
+
+  const handleLogOut = async () => {
+    try {
+      await signOut(auth);
+      dispatch(logOut());
+      navigation.navigate("Login");
+    } catch (error) {
+      console.error("Ошибка при выходе из аккаунта:", error);
+    }
+  };
+
+  useEffect(() => {
+    navigation.setOptions({
+      headerRight: () => (
+        <TouchableOpacity style={{ marginRight: 15 }} onPress={handleLogOut}>
+          <Feather name="log-out" size={24} color="black" />
+        </TouchableOpacity>
+      ),
+    });
+  }, [navigation, handleLogOut]);
 
   return (
     <View style={style.container}>
