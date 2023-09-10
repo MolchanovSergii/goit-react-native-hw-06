@@ -130,7 +130,15 @@ const CreatePostsScreen = ({ navigation }) => {
   return (
     <View style={style.container}>
       {photoUri ? (
-        <Image style={style.camera} source={{ uri: photoUri }} />
+        <View style={style.photoContainer}>
+          <Image style={style.camera} source={{ uri: photoUri }} />
+          <TouchableOpacity
+            style={style.trashButton}
+            onPress={() => setPhotoUri("")}
+          >
+            <Feather name="trash" size={24} color="red" />
+          </TouchableOpacity>
+        </View>
       ) : (
         <Camera style={style.camera} type={type} ref={setCameraRef}>
           <View style={style.photoView}>
@@ -202,7 +210,15 @@ const style = StyleSheet.create({
     backgroundColor: "transparent",
     justifyContent: "flex-end",
   },
+  photoContainer: {
+    position: "relative",
+  },
 
+  trashButton: {
+    position: "absolute",
+    right: 10,
+    top: 20,
+  },
   flipContainer: {
     flex: 0.2,
     alignSelf: "flex-end",
