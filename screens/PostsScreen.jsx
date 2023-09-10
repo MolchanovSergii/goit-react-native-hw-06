@@ -69,7 +69,12 @@ const PostsScreen = ({ route, navigation }) => {
           <View style={style.iconContainer}>
             <TouchableOpacity
               style={style.message_icon}
-              onPress={() => navigation.navigate("CommentsScreen")}
+              onPress={() =>
+                navigation.navigate("CommentsScreen", {
+                  postId: post.id,
+                  imageUrl: post.photoUri,
+                })
+              }
             >
               <Feather name="message-circle" size={24} color="black" />
             </TouchableOpacity>
