@@ -36,20 +36,11 @@ const CreatePostsScreen = ({ navigation }) => {
     })();
   }, []);
 
-  useEffect(() => {
-    if (photoUri) {
-      navigation.navigate("Posts", {
-        userLocation,
-        photoUri,
-        photoName,
-        locationName,
-      });
-    }
-  }, [photoUri]);
-
   useFocusEffect(
     useCallback(() => {
       setPhotoUri("");
+      setPhotoName("");
+      setLocationName("");
     }, [])
   );
 
@@ -86,17 +77,28 @@ const CreatePostsScreen = ({ navigation }) => {
         : address;
     };
 
-    if (address && address.length) {
+    let truncatedAddress = "";
+
+    if (address && address.length > 0 && !locationName) {
       const fullAddress = `${address[0].country}, ${address[0].region}`;
-      const truncatedAddress = truncateAddress(fullAddress);
+      truncatedAddress = truncateAddress(fullAddress);
       setLocationName(truncatedAddress);
     }
 
     setUserLocation(location);
 
-    await handleTakePhoto();
+    if (!photoUri) {
+      await handleTakePhoto();
+    }
 
     setLoading(false);
+
+    navigation.navigate("Posts", {
+      userLocation,
+      photoUri,
+      photoName,
+      locationName: locationName || truncatedAddress,
+    });
   };
 
   return (
