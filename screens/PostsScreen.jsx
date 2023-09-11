@@ -20,10 +20,8 @@ import { Feather, EvilIcons } from "@expo/vector-icons";
 const PostsScreen = ({ route, navigation }) => {
   const [posts, setPosts] = useState([]);
 
-  const userLocation = route.params?.userLocation;
   const photoUri = route.params?.photoUri;
   const photoName = route.params?.photoName;
-  const locationName = route.params?.locationName;
 
   const dispatch = useDispatch();
 
@@ -83,7 +81,7 @@ const PostsScreen = ({ route, navigation }) => {
               style={style.location_icon}
               onPress={() =>
                 navigation.navigate("MapScreen", {
-                  location: post.userLocation,
+                  location: post.location,
                 })
               }
             >
